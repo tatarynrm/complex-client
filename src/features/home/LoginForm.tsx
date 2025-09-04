@@ -12,6 +12,7 @@ import LoadingSpinner from "@/components/spinners/LoadingSpinner";
 import { useDispatch } from "react-redux";
 import { setUserRedux } from "@/store/slices/authSlice";
 import { useLogin } from "@/hooks/componentsHooks/useLogin";
+import ThemeToggle from "@/components/theme-toggle/ThemeToggleButton";
 
 export default function LoginForm() {
   const router = useRouter();
@@ -19,7 +20,6 @@ export default function LoginForm() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
-  const [submitting, setSubmitting] = useState(false); // Для кнопки
   const [isAuth, setIsAuth] = useState(false);
   const dispatch = useDispatch();
   useEffect(() => {
@@ -76,6 +76,7 @@ export default function LoginForm() {
           <h2 className="mb-6 text-center text-3xl font-bold text-gray-900">
             Авторизація
           </h2>
+       
           <form onSubmit={handleSubmit} className="space-y-6">
             <div>
               <Label htmlFor="email">Email</Label>

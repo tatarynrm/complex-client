@@ -1,12 +1,16 @@
-import LoginForm from '@/features/home/LoginForm'
-import React from 'react'
+import ThemeToggle from "@/components/theme-toggle/ThemeToggleButton";
+import LoginForm from "@/features/home/LoginForm";
+import React from "react";
 
 const Home = () => {
   return (
-    <div >
-      <LoginForm/>
+    <div className="relative">
+      <div className="absolute">
+        <ThemeToggle />
+      </div>
+      <LoginForm />
     </div>
-  )
-}
+  );
+};
 
-export default Home
+export default Home;
