@@ -39,7 +39,7 @@ export default function DashboardContent() {
   }, []);
 
   return (
-    <div className="min-h-screen bg-muted/50 mt-10  ">
+    <div className="min-h-screen mt-10  ">
       <div className="  space-y-6">
         <div className="text-center">
           <h1 className="text-3xl font-bold">Обрати машини для розсилки SMS</h1>

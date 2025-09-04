@@ -31,11 +31,11 @@ export default function LoginForm() {
           headers: { "Cache-Control": "no-store" }, // щоб уникнути 304
         });
 
-        // if (data.is_blocked) {
-        //   router.replace("/blocked");
-        //   return;
-        // }
-console.log(data,'DATA');
+        if (data.is_blocked) {
+          router.replace("/blocked");
+          return;
+        }
+  
 
         if (data.email) {
           dispatch(setUserRedux(data));
@@ -87,7 +87,7 @@ console.log(data,'DATA');
 
         <form onSubmit={handleSubmit} className="space-y-6">
           <div>
-            <Label htmlFor="email">Email</Label>
+            <Label htmlFor="email" className="text-black">Email</Label>
             <Input
               id="email"
               type="email"
@@ -95,12 +95,12 @@ console.log(data,'DATA');
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               placeholder="your.email@example.com"
-              className="mt-1"
+              className="mt-1 text-black"
             />
           </div>
 
           <div>
-            <Label htmlFor="password">Пароль</Label>
+            <Label htmlFor="password" className="text-black">Пароль</Label>
             <Input
               id="password"
               type="password"
@@ -108,7 +108,7 @@ console.log(data,'DATA');
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               placeholder="Ваш пароль"
-              className="mt-1"
+              className="mt-1 text-black"
             />
           </div>
 
