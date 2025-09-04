@@ -2,8 +2,8 @@
 import axios from "axios";
 
 const api = axios.create({
-  baseURL: "http://localhost:5000", // базова URL-адреса для запитів
-  // baseURL: "https://api8.ict.lviv.ua", // базова URL-адреса для запитів
+  // baseURL: "http://localhost:5000", // базова URL-адреса для запитів
+  baseURL: "https://api8.ict.lviv.ua", // базова URL-адреса для запитів
   withCredentials: true,
 });
 api.interceptors.response.use(
