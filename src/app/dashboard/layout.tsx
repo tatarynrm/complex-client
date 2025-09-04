@@ -6,9 +6,12 @@ import React from "react";
 const DasbhaordLayout = async ({ children }: { children: React.ReactNode }) => {
   const cookieStore = await cookies();
   const refreshToken = cookieStore.get("refresh_token");
-  if (!refreshToken) {
-    redirect("/");
-  }
+
+  // console.log(refreshToken,'REFRESH TOKEN');
+  
+  // if (!refreshToken) {
+  //   redirect("/");
+  // }
   return (
     <>
       <Header />

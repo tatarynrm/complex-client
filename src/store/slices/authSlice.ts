@@ -9,7 +9,8 @@ export interface IUser {
   email: string | null;
   id: string | number | null;
   surname?:string | null;
-  is_admin?:boolean
+  is_admin?:boolean;
+  is_blocked?:boolean;
 }
 
 interface UserState {
