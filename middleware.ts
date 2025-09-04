@@ -1,31 +1,35 @@
 // middleware.ts
+import { NextResponse } from "next/server";
+import type { NextRequest } from "next/server";
 
-import { NextResponse } from 'next/server';
-import type { NextRequest } from 'next/server';
-
-// Вкажи маршрути, які потрібно захищати
-const protectedPaths = ['/dashboard', '/admin'];
+const protectedPaths = ["/dashboard", "/admin"];
 
 export function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
-  // Перевіряємо, чи маршрут захищений
+  // ❌ Пропускаємо API та static (/_next, /api, /public тощо)
+  if (
+    pathname.startsWith("/api") ||
+    pathname.startsWith("/_next") ||
+    pathname.startsWith("/static") ||
+    pathname.startsWith("/favicon.ico")
+  ) {
+    return NextResponse.next();
+  }
+
   const isProtected = protectedPaths.some((path) => pathname.startsWith(path));
 
   if (!isProtected) {
-    return NextResponse.next(); // дозвіл доступу
+    return NextResponse.next();
   }
 
-  // Отримуємо access_token з cookies
-  const accessToken = request.cookies.get('access_token');
+  const accessToken = request.cookies.get("access_token");
 
   if (!accessToken) {
-    // Якщо токена немає, перенаправляємо на логін
-    const loginUrl = new URL('/login', request.url);
-    loginUrl.searchParams.set('from', pathname); // можна додати редірект після логіну
+    const loginUrl = new URL("/login", request.url);
+    loginUrl.searchParams.set("from", pathname);
     return NextResponse.redirect(loginUrl);
   }
 
-  // Якщо токен є — пропускаємо
   return NextResponse.next();
 }
