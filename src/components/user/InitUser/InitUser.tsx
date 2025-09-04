@@ -25,9 +25,11 @@ const InitUser = () => {
         dispatch(setUserRedux(data));
 
         if (data.is_blocked) {
-          return router.replace("/blocked");
+          router.replace("/blocked");
+          return null;
+        } else {
+          setIsAuth(true);
         }
-        setIsAuth(true);
       } catch (err: any) {
         if (err.response?.status === 401) {
           setIsAuth(false);
@@ -39,7 +41,8 @@ const InitUser = () => {
     };
 
     checkAuth();
-  }, [router, dispatch]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []); // 🔹 пустий масив залежностей
 
   if (isLoading) {
     return <LoadingSpinner />;
