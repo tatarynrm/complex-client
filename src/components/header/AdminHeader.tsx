@@ -16,6 +16,7 @@ import {
   SheetHeader,
   SheetTrigger,
 } from "@/components/ui/sheet";
+import ThemeToggle from "../theme-toggle/ThemeToggleButton";
 
 const navLinks = [
   { href: "/admin", label: "Головна адмін сторінка", isAdmin: true },
@@ -27,7 +28,7 @@ export default function AdminHeader() {
   const router = useRouter();
   const [isSheetOpen, setIsSheetOpen] = useState(false); // стан для Sheet
 
-  const handleLogout = async () => {
+   const handleLogout = async () => {
     try {
       const { data } = await api.get("/auth/logout");
       if (data.status === 200) {
@@ -64,12 +65,16 @@ export default function AdminHeader() {
         {/* Desktop Navigation */}
         <nav className="hidden md:flex items-center space-x-6">
           {filteredLinks.map((link) => (
-            <Link key={link.href} href={link.href} className="text-sm font-medium hover:underline">
+            <Link
+              key={link.href}
+              href={link.href}
+              className="text-sm font-medium hover:underline"
+            >
               {link.label}
             </Link>
           ))}
         </nav>
-
+        <ThemeToggle />
         <Button className="hidden md:block" size="sm" onClick={handleLogout}>
           Вихід
         </Button>

@@ -1,9 +1,18 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable @typescript-eslint/no-unused-vars */
+/* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 
 import React, { useEffect, useState } from "react";
-import api from "@/lib/axios"; // axios instance
+import api from "@/lib/axios";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Checkbox } from "@/components/ui/checkbox";
 
 export interface IUser {
   id: number;
@@ -23,39 +32,53 @@ const UsersList = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  useEffect(() => {
-    const fetchUsers = async () => {
-      try {
-        setLoading(true);
-        const res = await api.get<IUser[]>("/users/all");
-        setUsers(res.data);
-      } catch (err: any) {
-        setError("Помилка при завантаженні користувачів");
-      } finally {
-        setLoading(false);
-      }
-    };
+  // modal state
+  const [selectedUser, setSelectedUser] = useState<IUser | null>(null);
+  const [open, setOpen] = useState(false);
 
+  const fetchUsers = async () => {
+    try {
+      setLoading(true);
+      const res = await api.get<IUser[]>("/users/all");
+      setUsers(res.data);
+    } catch (err: any) {
+      setError("Помилка при завантаженні користувачів");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
     fetchUsers();
   }, []);
 
-  if (loading) {
-    return <div>Завантаження...</div>;
-  }
+  const handleRowClick = (user: IUser) => {
+    setSelectedUser(user);
+    setOpen(true);
+  };
 
-  if (error) {
-    return <div className="text-red-500">{error}</div>;
-  }
+  const handleSave = async () => {
+    if (!selectedUser) return;
+    try {
+      await api.put(`/users/${selectedUser.id}`, selectedUser);
+      setOpen(false);
+      fetchUsers(); // reload list
+    } catch (err) {
+      console.error("Помилка при оновленні користувача", err);
+    }
+  };
+
+  if (loading) return <div>Завантаження...</div>;
+  if (error) return <div className="text-red-500">{error}</div>;
 
   return (
     <div className="space-y-4">
       <h2 className="text-xl font-semibold">Список користувачів</h2>
 
-      {/* --- Desktop Table --- */}
       <div className="md:block overflow-x-auto">
         <table className="min-w-full border border-gray-300 rounded-md text-sm">
           <thead>
-            <tr className="bg-gray-100">
+            <tr className="bg-gray-100 dark:bg-black">
               <th className="px-4 py-2 border">ID</th>
               <th className="px-4 py-2 border">Email</th>
               <th className="px-4 py-2 border">Імʼя</th>
@@ -76,7 +99,11 @@ const UsersList = () => {
               </tr>
             ) : (
               users.map((user) => (
-                <tr key={user.id}>
+                <tr
+                  key={user.id}
+                  onClick={() => handleRowClick(user)}
+                  className="cursor-pointer hover:bg-muted"
+                >
                   <td className="border px-4 py-2">{user.id}</td>
                   <td className="border px-4 py-2">{user.email}</td>
                   <td className="border px-4 py-2">{user.name}</td>
@@ -101,31 +128,94 @@ const UsersList = () => {
         </table>
       </div>
 
-      {/* --- Mobile Cards ---
-      <div className="grid gap-4 md:hidden">
-        {users.length === 0 ? (
-          <p className="text-gray-500 text-center">Користувачів немає</p>
-        ) : (
-          users.map((user) => (
-            <div
-              key={user.id}
-              className="border rounded-lg p-4 shadow-sm bg-white"
-            >
-              <p className="text-sm text-gray-500">ID: {user.id}</p>
-              <p className="font-semibold">{user.email}</p>
-              <p>
-                {user.surname} {user.name} {user.last_name}
-              </p>
-              <p>📞 {user.phone_number ?? "-"}</p>
-              <div className="flex gap-4 mt-2 text-sm">
-                <span>Admin: {user.is_admin ? "✅" : "❌"}</span>
-                <span>Guard: {user.is_guard ? "✅" : "❌"}</span>
-                <span>Blocked: {user.is_blocked ? "🚫" : "✅"}</span>
+      {/* Modal */}
+      <Dialog open={open} onOpenChange={setOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Редагування користувача</DialogTitle>
+          </DialogHeader>
+
+          {selectedUser && (
+            <div className="space-y-3">
+              <Input
+                value={selectedUser.email}
+                onChange={(e) =>
+                  setSelectedUser({ ...selectedUser, email: e.target.value })
+                }
+                placeholder="Email"
+              />
+              <Input
+                value={selectedUser.name}
+                onChange={(e) =>
+                  setSelectedUser({ ...selectedUser, name: e.target.value })
+                }
+                placeholder="Імʼя"
+              />
+              <Input
+                value={selectedUser.surname}
+                onChange={(e) =>
+                  setSelectedUser({ ...selectedUser, surname: e.target.value })
+                }
+                placeholder="Прізвище"
+              />
+              <Input
+                value={selectedUser.last_name}
+                onChange={(e) =>
+                  setSelectedUser({
+                    ...selectedUser,
+                    last_name: e.target.value,
+                  })
+                }
+                placeholder="По-батькові"
+              />
+              <Input
+                value={selectedUser.phone_number ?? ""}
+                onChange={(e) =>
+                  setSelectedUser({
+                    ...selectedUser,
+                    phone_number: e.target.value,
+                  })
+                }
+                placeholder="Телефон"
+              />
+
+              <div className="flex items-center gap-2">
+                <Checkbox
+                  checked={!!selectedUser.is_admin}
+                  onCheckedChange={(val) =>
+                    setSelectedUser({ ...selectedUser, is_admin: !!val })
+                  }
+                />
+                <span>Адміністратор</span>
               </div>
+
+              <div className="flex items-center gap-2">
+                <Checkbox
+                  checked={!!selectedUser.is_guard}
+                  onCheckedChange={(val) =>
+                    setSelectedUser({ ...selectedUser, is_guard: !!val })
+                  }
+                />
+                <span>Охоронець</span>
+              </div>
+
+              <div className="flex items-center gap-2">
+                <Checkbox
+                  checked={!!selectedUser.is_blocked}
+                  onCheckedChange={(val) =>
+                    setSelectedUser({ ...selectedUser, is_blocked: !!val })
+                  }
+                />
+                <span>Заблокований</span>
+              </div>
+
+              <Button onClick={handleSave} className="w-full">
+                Зберегти
+              </Button>
             </div>
-          ))
-        )}
-      </div> */}
+          )}
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };
